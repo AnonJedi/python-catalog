@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+</head>
+<body>
+    <form method="post">
+        <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+        <p>Login</p>
+        <span>{{ error }}</span>
+        <input type="text" placeholder="login" name="username">
+        <input type="password" placeholder="password" name="password">
+        <input type="submit" value="LOGIN">
+    </form>
+</body>
+</html>
