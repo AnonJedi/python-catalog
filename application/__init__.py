@@ -23,12 +23,10 @@ def generate_csrf_token():
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
 from application.controllers import *
 from application.models import *
-
-if __name__ == '__main__':
-    app.run()
