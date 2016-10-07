@@ -151,13 +151,13 @@ def edit_product(product_id):
         if 'update' in request.form:
             form = ProductForm(request.form)
             if form.validate():
-                success = ProductService.update_product_by_product_id(product_id, {
+                error = ProductService.update_product_by_product_id(product_id, {
                     'title': form.title.data,
                     'description': form.description.data,
                     'price': form.price.data,
                     'category_id': request.form['category_id']
                 })
-                if success:
+                if not error:
                     return redirect(url_for('get_edit_products_page'))
         else:
             error = ProductService.delete_product_by_id(product_id)

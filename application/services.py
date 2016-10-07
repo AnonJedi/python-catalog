@@ -93,20 +93,13 @@ class ProductService:
     def update_product_by_product_id(product_id, new_product):
         old_product = Product.query.filter(Product.id == product_id).first()
         if not old_product:
-            return False
+            return 'Product is not found'
         old_product.title = new_product['title']
         old_product.price = convert_to_integer(new_product['price'])
         old_product.description = new_product['description']
-        # if old_product.category_id != new_product['category_id']:
-        #     new_category = Category.query\
-        #         .filter(Category.id == new_product['category_id']).first()
-        #     if not new_category:
-        #         return 'New category is not found'
         old_product.category_id = new_product['category_id']
-            # old_product.category = new_category
         session = get_db()
         session.commit()
-        return True
 
     @staticmethod
     def delete_product_by_id(product_id):
