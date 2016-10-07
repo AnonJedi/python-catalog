@@ -1,4 +1,4 @@
-# Test project for present and manage products
+# Test project for represent and manage products
 
 ### Preparing
 All development was carried out on linux mint 17.3
@@ -34,6 +34,7 @@ And for deactivation
 deactivate
 ```
 **!!!After that step all commands need to run under virtual environment!!!**
+
 4) pip requirements
 For install all pip requirements use
 ```
