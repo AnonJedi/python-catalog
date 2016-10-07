@@ -1,5 +1,5 @@
 # coding=utf-8
-from application.db_helper import convert_to_money_format, get_db, \
+from application.db_helper import get_db, \
     convert_to_integer
 from application.models import Admin, Category, Product
 
@@ -58,17 +58,31 @@ class CategoryService:
         session.add(Category(category_title))
 
 
+PRODUCTS_PER_PAGE = 4
+
+
 class ProductService:
 
     @staticmethod
-    def get_categories_and_products_by_category_id(category_id):
+    def get_categories_and_products_by_category_id(
+            category_id, page_number):
         categories = CategoryService.get_all_categories()
-        chosen_category = None
-        for category in categories:
-            if category.id == category_id:
-                chosen_category = category
-                break
-        return categories, chosen_category
+        total_products = Product.query\
+            .filter(Product.category_id == category_id).count()
+        total_pages = total_products / PRODUCTS_PER_PAGE \
+            if total_products % PRODUCTS_PER_PAGE == 0 else \
+            int(total_products / PRODUCTS_PER_PAGE) + 1
+        if page_number > total_pages:
+            return None
+        products = Product\
+            .query.filter(Product.category_id == category_id)\
+            .limit(PRODUCTS_PER_PAGE)\
+            .offset(PRODUCTS_PER_PAGE * (page_number - 1)).all()
+        return {
+            'categories': categories,
+            'total_pages': total_pages,
+            'products': products
+        }
 
     @staticmethod
     def get_all_products():

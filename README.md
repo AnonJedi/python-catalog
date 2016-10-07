@@ -47,3 +47,5 @@ From project folder run:
 ```
 python run_application.py
 ```
+
+For login as admin go to _/login_ and use follow login/password - admin/test

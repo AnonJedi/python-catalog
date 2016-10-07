@@ -17,14 +17,15 @@ def get_index_page():
         categories=categories)
 
 
-@app.route('/category/<int:category_id>')
-def get_products_page(category_id):
-    categories, chosen_category = \
-        ProductService.get_categories_and_products_by_category_id(category_id)
+@app.route('/category/<int:category_id>/page/<int:page>')
+def get_products_page(category_id, page):
+    data = ProductService\
+        .get_categories_and_products_by_category_id(category_id, page)
     return render_template(
         'index.html', is_admin=session.get('is_admin'),
-        categories=categories, chosen_category=chosen_category,
-        converter=convert_to_money_format)
+        categories=data['categories'], products=data['products'],
+        converter=convert_to_money_format, pages=data['total_pages'],
+        current_page=page)
 
 
 @app.route('/login', methods=['GET', 'POST'])

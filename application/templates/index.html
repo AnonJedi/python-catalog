@@ -1,25 +1,46 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="row">
-        <nav class="col-xs-10 col-sm-2 col-md-2 col-lg-2">
+    <div class="container-fluid row">
+        <nav class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
             <h3>Categories</h3>
             <ul>
                 {% for category in categories %}
-                    <li><a href="/category/{{ category.id }}">{{ category.title }}</a></li>
+                    <li><a href="/category/{{ category.id }}/page/1">{{ category.title }}</a></li>
                 {% endfor %}
             </ul>
         </nav>
-        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
-            {% if chosen_category %}
-                <h3>{{ chosen_category.title }}</h3>
-                {% for product in chosen_category.products %}
-                    <article>
-                        <p>{{ product.title }}</p>
-                        <p>{{ converter(product.price) }}</p>
-                        <p>{{ product.description }}</p>
-                    </article>
-                {% endfor %}
-
+        <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+            {% if products %}
+                <h3>{{ products[0].category.title }}</h3>
+                <div class="row">
+                    {% for product in products %}
+                        <article class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <img src="/static/img/{{ product.picture }}.png">
+                            <h4>{{ product.title }}</h4>
+                            <p>{{ converter(product.price) }}</p>
+                            <p style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {{ product.description }}
+                            </p>
+                        </article>
+                    {% endfor %}
+                </div>
+                {% if pages > 1 %}
+                    <div class="">
+                        <ul class="pagination">
+                            {% for item in range(pages) %}
+                                {% if item + 1 == current_page %}
+                                    <li class="active">
+                                {% else %}
+                                    <li>
+                                {% endif %}
+                                        <a href="/category/{{ products[0].category.id }}/page/{{ item + 1}}">
+                                            {{ item + 1 }}
+                                        </a>
+                                    </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>
