@@ -8,10 +8,12 @@
 <body>
     <header>
         <h1>Welcome to our store!</h1>
-        {% if is_admin %}
-            <a href="/edit">Edit store</a>
-            <a href="/logout">Logout</a>
-        {% endif %}
+        {% block admin_menu %}
+            {% if is_admin %}
+                <a href="/edit">Edit store</a>
+                <a href="/logout">Logout</a>
+            {% endif %}
+        {% endblock %}
     </header>
     {% block content %}{% endblock %}
 </body>

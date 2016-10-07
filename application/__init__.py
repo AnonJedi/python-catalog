@@ -1,3 +1,4 @@
+# coding=utf-8
 from flask import Flask, session, abort
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
@@ -12,7 +13,7 @@ app.secret_key = 'store test secret key'
 def csrf_protect():
     if request.method == "POST":
         token = session.pop('_csrf_token', None)
-        if not token or token != request.form.get('_csrf_token'):
+        if not token or unicode(token) != request.form.get('_csrf_token'):
             abort(403)
 
 

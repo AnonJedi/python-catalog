@@ -1,1 +1,24 @@
 {% extends "layout.html" %}
+{% block content %}
+    <nav>
+        <h3>Categories</h3>
+        <ul>
+            {% for category in categories %}
+                <li><a href="/category/{{ category.id }}">{{ category.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+    <div>
+        {% if chosen_category %}
+            <h3>{{ chosen_category.title }}</h3>
+            {% for product in chosen_category.products %}
+                <article>
+                    <p>{{ product.title }}</p>
+                    <p>{{ converter(product.price) }}</p>
+                    <p>{{ product.description }}</p>
+                </article>
+            {% endfor %}
+
+        {% endif %}
+    </div>
+{% endblock %}

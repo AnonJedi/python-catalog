@@ -1,0 +1,17 @@
+{% extends "admin_pages_layout.html" %}
+
+{% block content %}
+    <a href="/edit">< Back</a>
+    <nav>
+        <ul>
+            {% for product in products %}
+                <li><a href="/edit/product/{{ product.id }}">
+                    {{ product.category.title }},
+                    {{ product.title }},
+                    {{ converter(product.price) }}
+                </a></li>
+            {%  endfor %}
+        </ul>
+        <a href="/edit/product/new">Create new</a>
+    </nav>
+{% endblock %}

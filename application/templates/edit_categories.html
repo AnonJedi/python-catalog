@@ -1,0 +1,13 @@
+{% extends "admin_pages_layout.html" %}
+
+{% block content %}
+    <a href="/edit">< Back</a>
+    <nav>
+        <ul>
+            {% for category in categories %}
+                <li><a href="/edit/category/{{ category.id }}">{{ category.title }}</a></li>
+            {%  endfor %}
+        </ul>
+        <a href="/edit/category/new">Create new</a>
+    </nav>
+{% endblock %}

@@ -6,7 +6,7 @@ All development was carried out on linux mint 17.3
 #### Requirements
 1) python 2.7
 2) SQLite
-    For installation and creation our databases run next commands in console:
+    For installation and creation our databases run next commands in console from _path/to/project/application_ folder:
     ```
     sudo apt-get install sqlite3 libsqlite3-dev -y
     ```
