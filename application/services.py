@@ -65,17 +65,27 @@ class ProductService:
 
     @staticmethod
     def get_categories_and_products_by_category_id(
-            category_id, page_number):
+            category_id, page_number, min_price=0, max_price=None):
         categories = CategoryService.get_all_categories()
+        true_max_price = max_price if max_price else \
+            ProductService.fetch_max_price()
         total_products = Product.query\
-            .filter(Product.category_id == category_id).count()
+            .filter(Product.category_id == category_id,
+                    Product.price >= min_price,
+                    Product.price <= true_max_price).count()
         total_pages = total_products / PRODUCTS_PER_PAGE \
             if total_products % PRODUCTS_PER_PAGE == 0 else \
             int(total_products / PRODUCTS_PER_PAGE) + 1
         if page_number > total_pages:
-            return None
+            return {
+                'categories': categories,
+                'total_pages': total_pages,
+                'products': []
+            }
         products = Product\
-            .query.filter(Product.category_id == category_id)\
+            .query.filter(Product.category_id == category_id,
+                          Product.price >= min_price,
+                          Product.price <= true_max_price)\
             .limit(PRODUCTS_PER_PAGE)\
             .offset(PRODUCTS_PER_PAGE * (page_number - 1)).all()
         return {
@@ -124,3 +134,10 @@ class ProductService:
         session = get_db()
         session.delete(product)
         session.commit()
+
+    @staticmethod
+    def fetch_max_price():
+        session = get_db()
+        return session.execute("""
+            SELECT max(price) FROM product;
+        """).first()[0]

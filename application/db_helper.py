@@ -25,7 +25,7 @@ def convert_to_integer(decimal_number):
     """
     Convert number from money format like '18.50' to integer '1850'
     """
-    return int(decimal_number * 100)
+    return int(decimal_number) * 100
 
 
 def convert_to_money_format(integer_number):

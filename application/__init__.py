@@ -3,7 +3,10 @@ from flask import Flask, session, abort
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 import random
+import logging
 
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.secret_key = 'store test secret key'

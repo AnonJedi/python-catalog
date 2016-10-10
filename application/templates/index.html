@@ -2,8 +2,30 @@
 {% block content %}
     <div class="container-fluid row">
         <nav class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-            <h3>Categories</h3>
-            <ul>
+            <form class="col-xs-6 col-sm-6 col-md-6 col-lg-6" action="/price-filter" method="post" role="form">
+                <h4>Price filter</h4>
+                <input name=_csrf_token type=hidden value={{ csrf_token() }}>
+                {% for field in price_form %}
+                    {% if field.errors %}
+                        <div class="form-group has-error">
+                            {{ field.label }}
+                            {{ field(class="form-control") }}
+                            {% for error in  field.errors%}
+                                <p class="help-block">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="form-group">
+                            {{ field.label }}
+                            {{ field(class="form-control") }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <input class="btn btn-primary" type="submit" name="filter" value="filter">
+                <input class="btn btn-danger" type="submit" name="delete" value="delete">
+            </form>
+            <h3 class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Categories</h3>
+            <ul class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 {% for category in categories %}
                     <li><a href="/category/{{ category.id }}/page/1">{{ category.title }}</a></li>
                 {% endfor %}

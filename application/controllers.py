@@ -1,31 +1,48 @@
 # coding=utf-8
+from decimal import Decimal
 from flask import abort
 from flask import render_template, request, redirect, url_for, session
 
 from application import app
 from application.db_helper import convert_to_money_format, \
-    convert_to_decimal_format
-from application.forms import CategoryForm, ProductForm
+    convert_to_decimal_format, convert_to_integer
+from application.forms import CategoryForm, ProductForm, PriceFilterForm
 from application.services import AdminService, CategoryService, ProductService
+import logging
+
+
+log = logging.getLogger(__name__)
 
 
 @app.route('/')
 def get_index_page():
     categories = CategoryService.get_all_categories()
+    price_form = PriceFilterForm()
+    price_form.from_field.data = None if not session.get('price_from') \
+        else convert_to_decimal_format(session.get('price_from'))
+    price_form.to_field.data = None if not session.get('price_to') \
+        else convert_to_decimal_format(session.get('price_to'))
     return render_template(
         'index.html', is_admin=session.get('is_admin'),
-        categories=categories)
+        categories=categories, price_form=price_form)
 
 
 @app.route('/category/<int:category_id>/page/<int:page>')
 def get_products_page(category_id, page):
-    data = ProductService\
-        .get_categories_and_products_by_category_id(category_id, page)
+    price_form = PriceFilterForm()
+    price_form.from_field.data = None if not session.get('price_from') \
+        else convert_to_decimal_format(session.get('price_from'))
+    price_form.to_field.data = None if not session.get('price_to') \
+        else convert_to_decimal_format(session.get('price_to'))
+    data = ProductService \
+        .get_categories_and_products_by_category_id(
+            category_id, page, min_price=session.get('price_from', 0),
+            max_price=session.get('price_to'))
     return render_template(
         'index.html', is_admin=session.get('is_admin'),
         categories=data['categories'], products=data['products'],
         converter=convert_to_money_format, pages=data['total_pages'],
-        current_page=page)
+        current_page=page, price_form=price_form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -152,12 +169,16 @@ def edit_product(product_id):
         if 'update' in request.form:
             form = ProductForm(request.form)
             if form.validate():
-                error = ProductService.update_product_by_product_id(product_id, {
-                    'title': form.title.data,
-                    'description': form.description.data,
-                    'price': form.price.data,
-                    'category_id': request.form['category_id']
-                })
+                error = ProductService.update_product_by_product_id(
+                    product_id,
+                    {
+                        'title': form.title.data,
+                        'description': form.description.data,
+                        'price': form.price.data,
+                        'category_id':
+                            request.form[
+                                'category_id']
+                    })
                 if not error:
                     return redirect(url_for('get_edit_products_page'))
         else:
@@ -170,3 +191,32 @@ def edit_product(product_id):
         form.price.data = convert_to_decimal_format(product.price)
     return render_template('edit_product.html', form=form, product=product,
                            categories=categories, error=error)
+
+
+@app.route('/price-filter', methods=['POST'])
+def post_price_filter():
+    if 'delete' in request.form:
+        del session['price_from']
+        del session['price_to']
+        log.info('Price filter was cleared')
+    else:
+        try:
+            form = PriceFilterForm()
+            form.from_field.data = convert_to_integer(Decimal(request.form.get('from_field'))) \
+                if request.form.get('from_field') != u'' else 0
+            form.to_field.data = convert_to_integer(Decimal(request.form.get('to_field'))) \
+                if request.form.get('to_field') != u'' \
+                else ProductService.fetch_max_price()
+            if form.validate():
+                session['price_to'] = form.to_field.data
+                session['price_from'] = form.to_field.data \
+                    if form.to_field.data < form.from_field.data \
+                    else form.from_field.data
+                log.info('Price filter was set from %s to %s' \
+                         % (request.form.get('from_field'),
+                            request.form.get('to_field')))
+        except ValueError:
+            log.error('Error occurred while set price filter from %s to %s' \
+                      % (request.form.get('from_field'),
+                         request.form.get('to_field')))
+    return redirect(url_for('get_index_page'))
